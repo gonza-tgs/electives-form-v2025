@@ -8,10 +8,13 @@ CAPACITY_ELECTIVE_GE = int(st.secrets["CUPO_FG"])
 PROCESS_YEAR = int(st.secrets["PROCESS_YEAR"])
 
 # Supabase API
-APIKEY = st.secrets["SUPABASE_KEY"]
-URL = st.secrets["SUPABASE_URL"]
-supabase: Client = create_client(URL, APIKEY)
+@st.cache_resource
+def get_supabase_client() -> Client:
+    APIKEY = st.secrets["SUPABASE_KEY"]
+    URL = st.secrets["SUPABASE_URL"]
+    return create_client(URL, APIKEY)
 
+supabase: Client = get_supabase_client()
 
 CURSOS_MAP = {
     "2 medio G": 1,
