@@ -1,8 +1,9 @@
 from supabase import create_client, Client
 from streamlit import secrets
 from typing import List
+from form_validate import get_supabase_client
 
-
+@cache_data(ttl=3600)
 def get_electives(level: str) -> List[List[str]]:
     """
     Fetches and categorizes electives from a Supabase table based on a given level.
@@ -20,9 +21,7 @@ def get_electives(level: str) -> List[List[str]]:
     groups = "group_3medio" if level == "enabled_3medio" else "group_4medio"
 
     # 2. Retrieve credentials from Streamlit's secrets.
-    apikey = secrets["SUPABASE_KEY"]
-    url = secrets["SUPABASE_URL"]
-    supabase: Client = create_client(url, apikey)
+    supabase: Client = get_supabase_client()
 
     # 3. Query the 'electives' table.
     #    Select 'id', 'name', 'area', and the dynamic 'groups' column.

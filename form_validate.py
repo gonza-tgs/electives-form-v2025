@@ -1,5 +1,6 @@
 import streamlit as st
 import re
+import httpx
 from supabase import create_client, Client
 
 # Variables de Entorno
@@ -12,7 +13,11 @@ PROCESS_YEAR = int(st.secrets["PROCESS_YEAR"])
 def get_supabase_client() -> Client:
     APIKEY = st.secrets["SUPABASE_KEY"]
     URL = st.secrets["SUPABASE_URL"]
-    return create_client(URL, APIKEY)
+
+    http_client = httpx.Client(timeout=15.0)
+    client_options = {"http_client": http_client}
+
+    return create_client(URL, APIKEY, client_options=client_options)
 
 supabase: Client = get_supabase_client()
 
@@ -68,6 +73,8 @@ def email_exists(email: str) -> bool:
     Returns:
         bool: True si el correo electrónico es válido, False en caso contrario
     """
+    email = email.lower().strip()
+
     response = (
         supabase.table("students").select("id", "email").eq("email", email).execute()
     )
