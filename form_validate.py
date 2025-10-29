@@ -58,6 +58,7 @@ def same_area_electives(elective_1: str, elective_2: str, elective_3: str) -> bo
     return False if elective_1[:6] == elective_2[:6] == elective_3[:6] else True
 
 
+@st.cache_data(ttl=3600)
 def email_exists(email: str) -> bool:
     """Verificar si el correo electrónico es válido para inscribirse
 
@@ -74,6 +75,7 @@ def email_exists(email: str) -> bool:
     return True if len(response.data) > 0 else False
 
 
+@st.cache_data(ttl=3600)
 def valid_user(run: str, email: str, curso: str) -> bool:
     """Verificar si el RUN, email y curso corresponden al usuario
 
@@ -216,6 +218,7 @@ def ge_elective_availability(
     return True if current_enrollment <= capacity_elective_ge else False
 
 
+@st.cache_data(ttl=3600)
 def student_enrolled_in_previous_elective(
     run: str, elective: str, current_process_year: int = PROCESS_YEAR
 ) -> bool:
