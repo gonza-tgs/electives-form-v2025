@@ -1,4 +1,4 @@
-from supabase import create_client, Client
+# from supabase import create_client, Client
 from streamlit import secrets
 from typing import List
 from form_validate import get_supabase_client
