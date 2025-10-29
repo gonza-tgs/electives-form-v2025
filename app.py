@@ -115,8 +115,9 @@ def send_confirmation_email(
 # -------------------------------------------------------------
 # ----------------- TÍTULO DE LA APLICACIÓN -------------------
 # -------------------------------------------------------------
-st.title(f"Formulario de Inscripción de electivos - {PROCESS_YEAR}")
 st.image("./SOY_GARDEN.png")
+st.title(f"Formulario de Inscripción de electivos - {PROCESS_YEAR}")
+st.divider()
 st.text("Recuerda que debes seguir las reglas para inscribirte correctamente.")
 
 # Identificación del estudiante
@@ -310,4 +311,5 @@ if st.session_state.form_submitted:
         )
 
     # El botón permanece deshabilitado ya que st.session_state.form_submitted es True
+
 
