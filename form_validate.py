@@ -444,22 +444,22 @@ def validate_form(
         return False
 
     # Verificar disponibilidad del electivo 1
-    if not elective_availability(elective_1):
+    if not elective_availability(elective_1, PROCESS_YEAR, CAPACITY_ELECTIVE):
         st.error("Electivo 1 sin cupos disponibles.")
         return False
 
     # Verificar disponibilidad del electivo 2
-    if not elective_availability(elective_2):
+    if not elective_availability(elective_2, PROCESS_YEAR, CAPACITY_ELECTIVE):
         st.error("Electivo 2 sin cupos disponibles.")
         return False
 
     # Verificar disponibilidad del electivo 3
-    if not elective_availability(elective_3):
+    if not elective_availability(elective_3, PROCESS_YEAR, CAPACITY_ELECTIVE):
         st.error("Electivo 3 sin cupos disponibles.")
         return False
 
     # Verificar disponibilidad del electivo de formación general para el curso indicado
-    if not ge_elective_availability(elective_ge, class_name):
+    if not ge_elective_availability(elective_ge, class_name, CAPACITY_ELECTIVE_GE):
         st.error("Electivo de Formacion General sin cupos disponibles.")
         return False
 
@@ -479,5 +479,6 @@ def validate_form(
         return False
 
     return True
+
 
 
