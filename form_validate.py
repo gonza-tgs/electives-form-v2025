@@ -38,6 +38,8 @@ def valid_run(run: str) -> bool:
     Returns:
         bool: True si el RUN es válido, False en caso contrario
     """
+    # Mayúsculas
+    run = run.upper()
 
     # Definir la expresión regular para un RUN chileno
     run_regex = r"^\d{7,8}-[\dKk]$"
@@ -94,7 +96,9 @@ def valid_user(run: str, email: str, curso: str) -> bool:
     Returns:
         bool: True si corresponden, False en caso contrario
     """
+
     run = run.replace("-", "")
+    run = run.upper()
 
     id_curso = CURSOS_MAP.get(curso)
 
@@ -134,6 +138,7 @@ def current_student_record(run: str, process_year: int) -> bool:
         bool: True si ya se encuentra registrado, False en caso contrario.
     """
     run = run.replace("-", "")
+    run = run.upper()
 
     response = (
         supabase.table("enrollments")
@@ -244,6 +249,7 @@ def student_enrolled_in_previous_elective(
     previous_process_year = current_process_year - 1
 
     run = run.replace("-", "")
+    run = run.upper()
 
     # ID del electivo
     elective = elective[8:] # Quitar área a la que pertence el electivo
@@ -486,6 +492,7 @@ def validate_form(
         return False
 
     return True
+
 
 
 
