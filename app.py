@@ -141,7 +141,7 @@ with st.form(key="form"):
     # Email
     email = st.text_input(
         "Ingresa tu correo institucional:",
-        placeholder="name.surname@estudiantes.colegiotgs.cl",
+        placeholder="nombre.apellido@estudiantes.colegiotgs.cl",
     )
     st.caption("Ejemplo: francisca.perez@estudiantes.colegiotgs.cl")
 
@@ -311,5 +311,6 @@ if st.session_state.form_submitted:
         )
 
     # El botón permanece deshabilitado ya que st.session_state.form_submitted es True
+
 
 
