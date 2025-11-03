@@ -17,7 +17,7 @@ def get_supabase_client() -> Client:
     http_client = httpx.Client(timeout=15.0)
     client_options = {"http_client": http_client}
 
-    return create_client(URL, APIKEY, client_options=client_options)
+    return create_client(URL, APIKEY, storage_client_timeout=client_options)
 
 supabase: Client = get_supabase_client()
 
@@ -492,6 +492,7 @@ def validate_form(
         return False
 
     return True
+
 
 
 
