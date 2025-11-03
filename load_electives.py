@@ -3,7 +3,7 @@ from streamlit import secrets
 from typing import List
 from form_validate import get_supabase_client
 
-@cache_data(ttl=3600)
+@st.cache_data(ttl=3600)
 def get_electives(level: str) -> List[List[str]]:
     """
     Fetches and categorizes electives from a Supabase table based on a given level.
@@ -40,3 +40,4 @@ def get_electives(level: str) -> List[List[str]]:
     group_3 = [f'Área {row["area"]}: {row["name"]}' for row in response.data if row[groups] == 3]
 
     return [group_1, group_2, group_3]
+
