@@ -2,6 +2,7 @@ import streamlit as st
 import re
 import httpx
 from supabase import create_client, Client
+from supabase.client import ClientOptions
 
 # Variables de Entorno
 CAPACITY_ELECTIVE = int(st.secrets["CUPOS"])
@@ -494,6 +495,7 @@ def validate_form(
         return False
 
     return True
+
 
 
 
