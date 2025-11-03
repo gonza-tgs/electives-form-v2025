@@ -311,6 +311,3 @@ if st.session_state.form_submitted:
         )
 
     # El botón permanece deshabilitado ya que st.session_state.form_submitted es True
-
-
-

@@ -495,10 +495,3 @@ def validate_form(
         return False
 
     return True
-
-
-
-
-
-
-
