@@ -41,7 +41,7 @@ def handle_submission():
 
 
 def send_confirmation_email(
-    name, run, email, curso, electivo_1, electivo_2, electivo_3, electivo_fg, year
+    name, run, email, curso, electivo_1, electivo_2, electivo_3, electivo_fg, year, timestamp_str
 ):
     """
     Construye y envía un correo de confirmación al estudiante.
