@@ -223,7 +223,8 @@ if st.session_state.is_submitting and not st.session_state.form_submitted:
             time.sleep(2)
             st.rerun()
         else:
-            validate = validate_form(
+            # Esta ÚNICA función ahora valida E inserta los datos
+            success = validate_and_insert_form(
                 run,
                 email,
                 curso,
@@ -231,70 +232,45 @@ if st.session_state.is_submitting and not st.session_state.form_submitted:
                 electivo_2,
                 electivo_3,
                 electivo_fg,
-                PROCESS_YEAR,
             )
 
-            if not validate:
-                # En caso de que la validación falle durante el procesamiento
-                st.error(
-                    "Validación fallida. Por favor revisa los datos ingresados. El formulario se reiniciará en 8 segundos."
-                )
-                # 4. Habilitar el botón de nuevo para que el usuario pueda corregir y reintentar
+            if not success:
+                # La validación falló. El error ya fue mostrado por st.error() dentro de la función.
+                st.warning("El formulario se reiniciará para que puedas corregir.")
+                # Habilitar el botón de nuevo para que el usuario pueda corregir
                 st.session_state.is_submitting = False
-                # Opcionalmente, forzar un rerun si el error no es claro
-                time.sleep(8)  # Simula un tiempo de respuesta de 10 segundos
+                time.sleep(5) 
                 st.rerun()
             else:
-                # Intenta registrar la inscripción en la base de datos
-                result = insert_user_record(
+                # ¡ÉXITO! La validación pasó y los datos ya se insertaron.
+                # 1. Marcar como exitoso
+                st.session_state.form_submitted = True
+
+                # ******************************************************
+                # ** 2. INTENTAR ENVIAR EL CORREO DE CONFIRMACIÓN **
+                # ******************************************************
+                email_sent = send_confirmation_email(
+                    name,
                     run,
+                    email,
+                    curso,
                     electivo_1,
                     electivo_2,
                     electivo_3,
                     electivo_fg,
-                    curso,
                     PROCESS_YEAR,
                 )
-                if result:
-                    # 1. Marcar como exitoso
-                    st.session_state.form_submitted = True
 
-                    # ******************************************************
-                    # ** 2. INTENTAR ENVIAR EL CORREO DE CONFIRMACIÓN **
-                    # ******************************************************
-                    email_sent = send_confirmation_email(
-                        name,
-                        run,
-                        email,
-                        curso,
-                        electivo_1,
-                        electivo_2,
-                        electivo_3,
-                        electivo_fg,
-                        PROCESS_YEAR,
-                    )
-
-                    if email_sent:
-                        st.session_state.email_status = "enviado"
-                    else:
-                        st.session_state.email_status = "fallido"
-
-                    # 2. Deshabilitar el estado de envío (aunque form_submitted ya lo bloquea)
-                    st.session_state.is_submitting = False
-
-                    # 3. Forzar una re-ejecución para mostrar el resultado y el botón deshabilitado final
-                    st.rerun()
-
+                if email_sent:
+                    st.session_state.email_status = "enviado"
                 else:
-                    st.error(
-                        "Error al registrar la inscripción. Inténtalo de nuevo. El formulario se reiniciará en 10 segundos."
-                    )
+                    st.session_state.email_status = "fallido"
 
-                    # 4. Habilitar el botón de nuevo para que el usuario pueda corregir y reintentar
-                    st.session_state.is_submitting = False
-                    # Opcionalmente, forzar un rerun si el error no es claro
-                    time.sleep(10)  # Simula un tiempo de respuesta de 10 segundos
-                    st.rerun()
+                # 2. Deshabilitar el estado de envío (aunque form_submitted ya lo bloquea)
+                st.session_state.is_submitting = False
+
+                # 3. Forzar una re-ejecución para mostrar el resultado y el botón deshabilitado final
+                st.rerun()
 
 # --- Mostrar Resultado Final ---
 if st.session_state.form_submitted:
