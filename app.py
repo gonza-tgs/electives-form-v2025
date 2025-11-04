@@ -4,7 +4,7 @@ import time  # Necesario para la simulación de tiempo de respuesta
 import smtplib  # Para enviar correos
 import ssl  # Para conexión segura
 from email.message import EmailMessage  # Para construir el correo
-from form_validate import validate_form, insert_user_record, empty_form
+from form_validate import validate_and_insert_form, empty_form
 from load_electives import get_electives
 
 # --- Inicializar el Estado de Sesión ---
