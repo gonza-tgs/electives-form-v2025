@@ -3,6 +3,7 @@ import streamlit as st
 import time  # Necesario para la simulación de tiempo de respuesta
 import smtplib  # Para enviar correos
 import ssl  # Para conexión segura
+from datetime import datetime
 from email.message import EmailMessage  # Para construir el correo
 from form_validate import validate_and_insert_form, empty_form
 from load_electives import get_electives
@@ -84,6 +85,8 @@ def send_confirmation_email(
                     <li><strong>Electivo 2:</strong> {electivo_2}</li>
                     <li><strong>Electivo 3:</strong> {electivo_3}</li>
                     <li><strong>Electivo Formación General:</strong> {electivo_fg}</li>
+
+                    <li style="color: #444;"><strong>Fecha y Hora de Inscripción:</strong> {timestamp_str}</li>
                 </ul>
                 <p>Por favor, guarda este correo como comprobante de tu inscripción.</p>
                 <p>Saludos,<br>Equipo de Coordinación Académica TGS</p>
@@ -249,6 +252,12 @@ if st.session_state.is_submitting and not st.session_state.form_submitted:
                 # ******************************************************
                 # ** 2. INTENTAR ENVIAR EL CORREO DE CONFIRMACIÓN **
                 # ******************************************************
+                # ---> 1. Genera la marca de tiempo AHORA <---
+                # (Usará la hora del servidor, que usualmente es UTC)
+                now = datetime.now()
+                # Formato: 03-11-2025 21:58:30 (Día-Mes-Año Hora:Min:Seg)
+                # Le añadimos (UTC) para que el usuario sepa la zona horaria
+                timestamp_string = now.strftime("%d-%m-%Y %H:%M:%S (UTC)")
                 email_sent = send_confirmation_email(
                     name,
                     run,
@@ -259,6 +268,7 @@ if st.session_state.is_submitting and not st.session_state.form_submitted:
                     electivo_3,
                     electivo_fg,
                     PROCESS_YEAR,
+                    timestamp_string
                 )
 
                 if email_sent:
