@@ -4,6 +4,7 @@ import time  # Necesario para la simulación de tiempo de respuesta
 import smtplib  # Para enviar correos
 import ssl  # Para conexión segura
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from email.message import EmailMessage  # Para construir el correo
 from form_validate import validate_and_insert_form, empty_form
 from load_electives import get_electives
@@ -253,11 +254,12 @@ if st.session_state.is_submitting and not st.session_state.form_submitted:
                 # ** 2. INTENTAR ENVIAR EL CORREO DE CONFIRMACIÓN **
                 # ******************************************************
                 # ---> 1. Genera la marca de tiempo AHORA <---
-                # (Usará la hora del servidor, que usualmente es UTC)
-                now = datetime.now()
+                # (Usará la hora de Santiago de Chile)
+                tz = ZoneInfo("America/Santiago")
+                now = datetime.now(tz=tz)
                 # Formato: 03-11-2025 21:58:30 (Día-Mes-Año Hora:Min:Seg)
                 # Le añadimos (UTC) para que el usuario sepa la zona horaria
-                timestamp_string = now.strftime("%d-%m-%Y %H:%M:%S (UTC)")
+                timestamp_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 email_sent = send_confirmation_email(
                     name,
                     run,
@@ -295,5 +297,6 @@ if st.session_state.form_submitted:
             "No pudimos enviar el correo de confirmación. "
             "Por favor, toma una captura de pantalla de esta página como comprobante."
         )
+
 
     # El botón permanece deshabilitado ya que st.session_state.form_submitted es True
