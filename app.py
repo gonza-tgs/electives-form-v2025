@@ -9,6 +9,13 @@ from email.message import EmailMessage  # Para construir el correo
 from form_validate import validate_and_insert_form, empty_form
 from load_electives import get_electives
 
+# --- Formulario cerrado: se abre con FORMULARIO_ABIERTO = true en los secrets ---
+if not st.secrets.get("FORMULARIO_ABIERTO", False):
+    st.image("./SOY_GARDEN.png")
+    st.title("Inscripción de electivos")
+    st.info("El proceso de inscripción de electivos está cerrado por ahora.")
+    st.stop()
+
 # --- Inicializar el Estado de Sesión ---
 # 'is_submitting' (booleano): Controla el atributo 'disabled' del botón.
 if "is_submitting" not in st.session_state:

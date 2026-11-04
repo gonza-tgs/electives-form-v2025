@@ -37,6 +37,7 @@ def prepare_database():
 def make_app():
     os.chdir(ROOT)
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30)
+    app.secrets["FORMULARIO_ABIERTO"] = True
     app.secrets["DATABASE_URL"] = APP_URL
     app.secrets["LEVEL"] = "enabled_4medio"
     app.secrets["PROCESS_YEAR"] = 2027
@@ -79,3 +80,15 @@ def test_formulario_inscribe_y_bloquea_el_boton():
     with psycopg.connect(ADMIN_URL) as conn:
         assert conn.execute("SELECT count(*) FROM public.enrollments").fetchone()[0] == 3
         assert conn.execute("SELECT count(*) FROM public.enrollments_ge").fetchone()[0] == 1
+
+
+def test_formulario_cerrado_muestra_aviso_sin_tocar_la_base():
+    app = make_app()
+    del app.secrets["FORMULARIO_ABIERTO"]
+    app.secrets["DATABASE_URL"] = "postgresql://nadie@127.0.0.1:1/inexistente"
+    app.run()
+    assert not app.exception
+    assert [i.value for i in app.info] == ["El proceso de inscripción de electivos está cerrado por ahora."]
+    assert len(app.radio) == 0
+    assert len(app.text_input) == 0
+    assert len(app.button) == 0
