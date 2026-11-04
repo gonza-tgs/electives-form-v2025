@@ -1,26 +1,43 @@
-import streamlit as st
+import logging
 import re
-from supabase import create_client, Client
-from supabase.client import ClientOptions
+
+import streamlit as st
+from psycopg_pool import ConnectionPool
+
+logger = logging.getLogger(__name__)
 
 # --- Cargar variables de entorno ---
 CAPACITY_ELECTIVE = int(st.secrets["CUPOS"])
 CAPACITY_ELECTIVE_GE = int(st.secrets["CUPO_FG"])
 PROCESS_YEAR = int(st.secrets["PROCESS_YEAR"])
 
-# --- Conexión a Supabase (igual que antes) ---
-@st.cache_resource
-def get_supabase_client() -> Client:
-    APIKEY = st.secrets["SUPABASE_KEY"]
-    URL = st.secrets["SUPABASE_URL"]
-    client_options = ClientOptions(
-        postgrest_client_timeout=15, # Puedes mantener o subir este timeout
-        storage_client_timeout=15,
-        schema="public",
+INSCRIBIR_SQL = """
+    SELECT public.validar_e_inscribir_electivos(
+        p_run => %(p_run)s,
+        p_email => %(p_email)s,
+        p_curso_nombre => %(p_curso_nombre)s,
+        p_electivo_1_full => %(p_electivo_1_full)s,
+        p_electivo_2_full => %(p_electivo_2_full)s,
+        p_electivo_3_full => %(p_electivo_3_full)s,
+        p_electivo_fg_nombre => %(p_electivo_fg_nombre)s,
+        p_process_year => %(p_process_year)s,
+        p_cupos_electivo => %(p_cupos_electivo)s,
+        p_cupos_fg => %(p_cupos_fg)s
     )
-    return create_client(URL, APIKEY, options=client_options)
+"""
 
-supabase: Client = get_supabase_client()
+# --- Conexión a Postgres ---
+@st.cache_resource
+def get_pool() -> ConnectionPool:
+    return ConnectionPool(
+        st.secrets["DATABASE_URL"],
+        min_size=1,
+        max_size=10,
+        timeout=15,
+        check=ConnectionPool.check_connection,
+        open=True,
+        kwargs={"options": "-c statement_timeout=15000"},
+    )
 
 # --- Validaciones "Ligeras" (no usan la red) ---
 
@@ -47,7 +64,7 @@ def empty_form(
     empty_answers = [ans is None or str(ans).strip() == "" or str(ans) == "None" for ans in answers]
     return any(empty_answers)
 
-# --- Función Principal (RPC) ---
+# --- Función Principal ---
 
 def validate_and_insert_form(
     run: str,
@@ -59,14 +76,14 @@ def validate_and_insert_form(
     elective_ge: str,
 ):
     """
-    Ejecuta validación E inserción en la DB usando UNA SOLA llamada RPC.
+    Ejecuta validación E inserción en la DB usando UNA SOLA llamada a la función SQL.
     """
-    
+
     # 1. Validaciones ligeras primero
     if not valid_run(run):
         st.error("El RUN ingresado no tiene un formato válido.")
         return False
-    
+
     # 2. Agrupar todos los parámetros para la función SQL
     params = {
         "p_run": run,
@@ -82,13 +99,12 @@ def validate_and_insert_form(
     }
 
     try:
-        # 3. Llamar la función RPC
-        # ¡Esta es la ÚNICA llamada a la base de datos!
-        response = supabase.rpc("validar_e_inscribir_electivos", params).execute()
-        
+        # 3. Llamar la función. El bloque confirma la transacción al salir,
+        #    lo que también libera los bloqueos tomados por la función.
+        with get_pool().connection() as conn:
+            result = conn.execute(INSCRIBIR_SQL, params).fetchone()[0]
+
         # 4. Interpretar la respuesta del JSON
-        result = response.data
-        
         if result["valido"]:
             return True # ¡Éxito! La validación pasó Y los datos se insertaron.
         else:
@@ -96,7 +112,8 @@ def validate_and_insert_form(
             st.error(result["mensaje"])
             return False
 
-    except Exception as e:
-        # Capturar errores de red (como el 502)
-        st.error(f"Error de conexión con la base de datos. Intenta de nuevo. (Detalle: {e})")
+    except Exception:
+        # El detalle queda en los logs: puede incluir datos de la conexión.
+        logger.exception("Error al inscribir electivos")
+        st.error("Error de conexión con la base de datos. Intenta de nuevo.")
         return False
