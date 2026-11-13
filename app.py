@@ -8,12 +8,15 @@ from zoneinfo import ZoneInfo
 from email.message import EmailMessage  # Para construir el correo
 from form_validate import validate_and_insert_form, empty_form
 from load_electives import get_electives
+from apertura import estado_formulario
 
-# --- Formulario cerrado: se abre con FORMULARIO_ABIERTO = true en los secrets ---
-if not st.secrets.get("FORMULARIO_ABIERTO", False):
+# --- Apertura: FORMULARIO_ABIERTO = true y, si están, FORMULARIO_APERTURA / FORMULARIO_CIERRE (ver apertura.py) ---
+# Se revisa en cada ejecución, también al enviar: un envío después del cierre no se procesa.
+abierto, aviso = estado_formulario(st.secrets)
+if not abierto:
     st.image("./SOY_GARDEN.png")
     st.title("Inscripción de electivos")
-    st.info("El proceso de inscripción de electivos está cerrado por ahora.")
+    st.info(aviso)
     st.stop()
 
 # --- Inicializar el Estado de Sesión ---
