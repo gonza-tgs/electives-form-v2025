@@ -23,7 +23,7 @@ ssh "$VPS" "docker exec \$(docker ps -q --filter name=$SERVICE) pg_dump -U elect
 
 # Un archivo truncado o corrupto no se puede listar: falla aquí y no queda como backup válido.
 TABLAS=$(ssh "$VPS" "docker exec -i \$(docker ps -q --filter name=$SERVICE) pg_restore --list" < "$FILE.tmp" | grep -c ' TABLE DATA public ')
-[ "$TABLAS" -eq 6 ] || { echo "Backup inválido: $TABLAS tablas con datos, se esperaban 6. Quedó en $FILE.tmp" >&2; exit 1; }
+[ "$TABLAS" -eq 7 ] || { echo "Backup inválido: $TABLAS tablas con datos, se esperaban 7. Quedó en $FILE.tmp" >&2; exit 1; }
 
 mv "$FILE.tmp" "$FILE"
 echo "Backup listo: $FILE ($(du -h "$FILE" | cut -f1), $TABLAS tablas)"
