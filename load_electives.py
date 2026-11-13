@@ -6,8 +6,8 @@ from form_validate import get_pool
 
 # Las columnas no pueden pasarse como parámetros SQL, por eso cada nivel tiene su consulta fija.
 ELECTIVES_SQL = {
-    "enabled_3medio": "SELECT name, area, group_3medio FROM public.electives WHERE enabled_3medio ORDER BY id",
-    "enabled_4medio": "SELECT name, area, group_4medio FROM public.electives WHERE enabled_4medio ORDER BY id",
+    "enabled_3medio": "SELECT name, area, group_3medio FROM public.electives WHERE enabled_3medio ORDER BY area, id",
+    "enabled_4medio": "SELECT name, area, group_4medio FROM public.electives WHERE enabled_4medio ORDER BY area, id",
 }
 
 @st.cache_data(ttl=3600)
