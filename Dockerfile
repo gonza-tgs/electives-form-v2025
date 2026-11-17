@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py apertura.py form_validate.py load_electives.py SOY_GARDEN.png ./
+COPY app.py apertura.py form_validate.py load_electives.py SOY_GARDEN.png favicon.png ./
 
 RUN useradd --create-home --uid 1000 appuser
 USER appuser

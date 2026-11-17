@@ -11,7 +11,7 @@ from load_electives import get_electives
 from apertura import estado_formulario
 
 # Título e ícono de la pestaña del navegador. Tiene que ser la primera llamada a st.
-st.set_page_config(page_title="Inscripción de Electivos", page_icon="./SOY_GARDEN.png")
+st.set_page_config(page_title="Inscripción de Electivos", page_icon="./favicon.png")
 
 # --- Apertura: FORMULARIO_ABIERTO = true y, si están, FORMULARIO_APERTURA / FORMULARIO_CIERRE (ver apertura.py) ---
 # Se revisa en cada ejecución, también al enviar: un envío después del cierre no se procesa.
